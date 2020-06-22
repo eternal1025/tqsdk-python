@@ -8,8 +8,17 @@ import os
 import threading
 import asyncio
 import websockets
+import logging
+from _pytest.logging import LogCaptureHandler
 from aiohttp import web
 
+class MonkeyPatching():
+    def monkey_patching_pytest_logging_emit(self, record: logging.LogRecord):
+        self.records = []
+        self.records.append(record)
+        logging.StreamHandler.emit(self, record)
+
+LogCaptureHandler.emit = MonkeyPatching.monkey_patching_pytest_logging_emit
 
 class MockInsServer():
     def __init__(self, port):
